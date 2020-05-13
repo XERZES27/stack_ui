@@ -17,6 +17,7 @@ class _jumbleState extends State<jumble> {
   int index;
   bool openCart = false;
   bool setTimer = false;
+  bool allowTransition = true;
   int horizontalDragBuildUp=0;
   int verticalDragBuildUp=0;
 
@@ -26,9 +27,8 @@ class _jumbleState extends State<jumble> {
 
   void setResetTimer(){
     Timer(Duration(seconds: 1), () {
-      setTimer = false;
-      print(horizontalDragBuildUp);
-      horizontalDragBuildUp = 0;
+      allowTransition = true;
+
     });
 
   }
@@ -75,20 +75,11 @@ class _jumbleState extends State<jumble> {
                           if(draggedScreenPercentageX < 0.4 && draggedScreenPercentageX > 0.1){
                                 if(dragDetails.delta.dx > 3){
                                   if(index != 0){
-                                    if(horizontalDragBuildUp <-34){
-                                      setTimer = false;
-                                      _bottomNavigationBloc.add(TransitionEvent(index: index-1));
-                                    }
-                                    else{
-                                        if(setTimer) {
-                                          horizontalDragBuildUp -= 5;
-                                          print(" negative $horizontalDragBuildUp");
-                                        }
-                                        else{
-                                          setTimer = true;
-                                          setResetTimer();
-                                        }
-                                    }
+                                    if(allowTransition){
+                                    allowTransition = false;
+                                    setResetTimer();
+                                      _bottomNavigationBloc.add(TransitionEvent(index: index-1));}
+//
                                   }
                                 }
 
@@ -96,21 +87,11 @@ class _jumbleState extends State<jumble> {
                           else if( draggedScreenPercentageX >0.6 && draggedScreenPercentageX < 0.9){
                             if(dragDetails.delta.dx < -3){
                               if(index != 2){
-                                if(horizontalDragBuildUp >34){
-                                  setTimer = false;
-                                  _bottomNavigationBloc.add(TransitionEvent(index: index+1));
-                                }
-                                else{
-                                  if(setTimer) {
-                                    horizontalDragBuildUp += 5;
-                                    print(" positive +$horizontalDragBuildUp");
-                                  }
-                                  else{
-                                    setTimer = true;
-                                    setResetTimer();
-
-                                  }
-                                }
+                                if(allowTransition){
+                                allowTransition = false;
+                                setResetTimer();
+                                _bottomNavigationBloc.add(TransitionEvent(index: index+1));}
+//
                               }
 
                             }
