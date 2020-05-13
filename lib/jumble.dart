@@ -5,6 +5,7 @@ import 'package:stackui/UI/CategoryPage.dart';
 import 'package:stackui/UI/HomePage.dart';
 import 'package:stackui/bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:async';
 
 class jumble extends StatefulWidget {
   @override
@@ -15,9 +16,21 @@ class _jumbleState extends State<jumble> {
   BottomNavigationBloc _bottomNavigationBloc;
   int index;
   bool openCart = false;
+  bool setTimer = false;
+  int horizontalDragBuildUp=0;
+  int verticalDragBuildUp=0;
 
   void callTransition(int index) {
     _bottomNavigationBloc.add(TransitionEvent(index: index));
+  }
+
+  void setResetTimer(){
+    Timer(Duration(seconds: 1), () {
+      setTimer = false;
+      print(horizontalDragBuildUp);
+      horizontalDragBuildUp = 0;
+    });
+
   }
 
   @override
@@ -52,6 +65,63 @@ class _jumbleState extends State<jumble> {
                           ? 0-(screenHeight*0.10)
                           : 0,
                       child: GestureDetector(
+
+                        onHorizontalDragUpdate: (dragDetails){
+                          double draggedScreenPercentageY =
+                              dragDetails.globalPosition.dy / screenHeight;
+                          double draggedScreenPercentageX =
+                              dragDetails.globalPosition.dx / screenwWidth;
+
+                          if(draggedScreenPercentageX < 0.4 && draggedScreenPercentageX > 0.1){
+                                if(dragDetails.delta.dx > 3){
+                                  if(index != 0){
+                                    if(horizontalDragBuildUp <-34){
+                                      setTimer = false;
+                                      _bottomNavigationBloc.add(TransitionEvent(index: index-1));
+                                    }
+                                    else{
+                                        if(setTimer) {
+                                          horizontalDragBuildUp -= 5;
+                                          print(" negative $horizontalDragBuildUp");
+                                        }
+                                        else{
+                                          setTimer = true;
+                                          setResetTimer();
+                                        }
+                                    }
+                                  }
+                                }
+
+                          }
+                          else if( draggedScreenPercentageX >0.6 && draggedScreenPercentageX < 0.9){
+                            if(dragDetails.delta.dx < -3){
+                              if(index != 2){
+                                if(horizontalDragBuildUp >34){
+                                  setTimer = false;
+                                  _bottomNavigationBloc.add(TransitionEvent(index: index+1));
+                                }
+                                else{
+                                  if(setTimer) {
+                                    horizontalDragBuildUp += 5;
+                                    print(" positive +$horizontalDragBuildUp");
+                                  }
+                                  else{
+                                    setTimer = true;
+                                    setResetTimer();
+
+                                  }
+                                }
+                              }
+
+                            }
+
+                          }
+
+
+                        },
+
+
+
                         onVerticalDragUpdate: (dragDetails) {
                           double draggedScreenPercentageY =
                               dragDetails.globalPosition.dy / screenHeight;
